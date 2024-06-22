@@ -1,0 +1,40 @@
+.table {
+  & .actions {
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & > button {
+      font-weight: bold;
+      width: 10rem;
+    }
+  }
+
+  & .circular-status {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: red;
+  }
+}
+
+.actionsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 1rem;
+
+  & div {
+    width: 45%;
+  }
+}
+
+.actions {
+  text-align: end;
+
+  & button:last-of-type {
+    margin-left: 10px;
+  }
+}

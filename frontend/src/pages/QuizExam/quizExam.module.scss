@@ -1,0 +1,101 @@
+.table {
+  & .actions {
+    padding: 1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    & > button {
+      font-weight: bold;
+      width: 10rem;
+    }
+  }
+
+  & .circular-status {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background-color: red;
+  }
+}
+
+.actionsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 1rem;
+
+  & div {
+    width: 45%;
+  }
+}
+
+.actions {
+  text-align: end;
+
+  & button:last-of-type {
+    margin-left: 10px;
+  }
+}
+
+.tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  & .tab {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    border-radius: 10px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    width: 50px;
+    cursor: pointer;
+    transition: all .2s ease-in;
+
+    & .number {
+      padding: .5rem;
+      font-weight: bold;
+    }
+
+    & .status {
+      background-color: rgb(176, 176, 176);
+      height: 35px;
+      width: 100%;
+      color: transparent;
+
+      &.active {
+        background: radial-gradient(circle, rgb(255, 255, 255) 0%, rgb(255, 137, 27) 100%);
+      }
+
+      &.correct {
+        background: teal;
+        color: white;
+      }
+      &.notCorrect {
+        background: red;
+        color: white;
+      }
+    }
+  }
+}
+
+.questionsWrapper {
+  margin: 1rem 0;
+
+}
+
+.tabsWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-bottom: 1rem;
+}
