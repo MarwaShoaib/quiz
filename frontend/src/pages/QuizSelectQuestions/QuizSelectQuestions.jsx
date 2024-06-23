@@ -32,7 +32,7 @@ export default function QuizSelectQuestions(props) {
   }, []);
 
   const onClickAddQuestion = () => {
-    navigate("/add-question");
+    navigate("/add-question?quizId=" + quizId);
   };
 
   const onClickAddSelected = async () => {
