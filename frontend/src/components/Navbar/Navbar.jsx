@@ -33,6 +33,24 @@ const Navbar = () => {
             <div>Quiz system</div>
           </Link>
           <Link
+            to="/quiz-management"
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+            }}
+          >
+            Quiz Management
+          </Link>
+          <Link
+            to="/quiz-room"
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+            }}
+          >
+            Quiz Room
+          </Link>
+          <Link
             to="/topics"
             style={{
               color: "#fff",

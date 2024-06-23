@@ -17,18 +17,16 @@ import {
   Typography,
 } from "@mui/material";
 import { Clear, DesignServices } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import TopicFormSection from "./TopicFormSection";
-import TopicQuestionType from "./TopicQuestionType";
-import {
-  ActiveQuestionTypes,
-  getDomainName,
-  getSubDomainName,
-} from "../../config";
 import { Random } from "@mongez/reinforcements";
-import { Form, requiredRule, useFormControl } from "@mongez/react-form";
+import {
+  Form,
+  HiddenInput,
+  requiredRule,
+  useFormControl,
+} from "@mongez/react-form";
 import { atom } from "@mongez/react-atom";
 
 function SelectInput({ label, data, ...props }) {
@@ -112,7 +110,7 @@ function generateEmptyTopic() {
     topicId: "",
     totalQuestions: 0,
     duration: 0,
-    questions: [
+    questionTypes: [
       {
         type: "",
         easy: undefined,
@@ -125,6 +123,10 @@ function generateEmptyTopic() {
 
 const criteriaAtom = atom({
   key: "criteria",
+  beforeUpdate(value) {
+    console.trace("WHY");
+    return value;
+  },
   default: {
     topics: [generateEmptyTopic()],
     selectedTopicsIds: [],
@@ -184,7 +186,7 @@ function TopicElement({ topic, index }) {
       let totalQuestions = 0;
       let duration = 0;
 
-      for (const question of topic.questions) {
+      for (const question of topic.questionTypes) {
         const easy = question.easy || 0;
         const medium = question.medium || 0;
         const hard = question.hard || 0;
@@ -212,7 +214,7 @@ function TopicElement({ topic, index }) {
       hard: undefined,
     };
 
-    topics[index].questions.push(newQuestion);
+    topics[index].questionTypes.push(newQuestion);
 
     criteriaAtom.change("topics", [...topics]);
   };
@@ -220,7 +222,7 @@ function TopicElement({ topic, index }) {
   const deleteQuestion = (question) => () => {
     const topics = criteriaAtom.get("topics");
 
-    topics[index].questions = topics[index].questions.filter(
+    topics[index].questionTypes = topics[index].questionTypes.filter(
       (q) => q.id !== question.id
     );
 
@@ -228,7 +230,7 @@ function TopicElement({ topic, index }) {
   };
 
   return (
-    <Accordion>
+    <Accordion defaultExpanded={index === 0}>
       <AccordionSummary>
         {topicInfo?.title || `Topic ${index + 1}`}
       </AccordionSummary>
@@ -269,8 +271,16 @@ function TopicElement({ topic, index }) {
             </div>
 
             <div>Total Questions: {topic.totalQuestions}</div>
+            <HiddenInput
+              name={`topics.${index}.totalQuestions`}
+              value={topic.totalQuestions}
+            />
 
             <div>Est Duration: {topic.duration}</div>
+            <HiddenInput
+              name={`topics.${index}.duration`}
+              value={topic.duration}
+            />
           </div>
         </div>
 
@@ -278,9 +288,9 @@ function TopicElement({ topic, index }) {
           Questions Types
         </Typography>
         {/* Questions */}
-        {topic.questions.map((question, idx) => (
+        {topic.questionTypes.map((question, idx) => (
           <div
-            key={question.id || question.typeId || idx}
+            key={question.id || question.type || idx}
             style={{
               display: "flex",
               justifyContent: "space-between",
@@ -295,10 +305,11 @@ function TopicElement({ topic, index }) {
               }}
             >
               <SelectInput
-                name={`topics.${index}.questionTypes.${idx}.typeId`}
+                name={`topics.${index}.questionTypes.${idx}.type`}
                 label="Question Type"
                 placeholder="Select Question Type"
                 required
+                defaultValue={question.type}
                 onChange={updateSelectedQuestionType(question)}
                 data={criteriaAtom.get("questionTypes")}
               />
@@ -310,6 +321,7 @@ function TopicElement({ topic, index }) {
                 placeholder="Easy"
                 label="Easy"
                 required
+                defaultValue={question.easy}
                 onChange={updateQuestionTypeTotal(question, "easy")}
               />
             </div>
@@ -319,6 +331,7 @@ function TopicElement({ topic, index }) {
                 placeholder="Medium"
                 label="Medium"
                 required
+                defaultValue={question.medium}
                 onChange={updateQuestionTypeTotal(question, "medium")}
               />
             </div>
@@ -328,6 +341,7 @@ function TopicElement({ topic, index }) {
                 placeholder="Hard"
                 label="Hard"
                 required
+                defaultValue={question.hard}
                 onChange={updateQuestionTypeTotal(question, "hard")}
               />
             </div>
@@ -369,7 +383,30 @@ function TopicElement({ topic, index }) {
 
 export default function QuizCriteria(props) {
   const { id: quizId } = useParams();
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:4000/api/criteria/" + quizId)
+      .then((response) => {
+        const criteria = response.data;
+
+        if (criteria) {
+          criteriaAtom.merge({
+            topics: criteria.topics.map((topic) => ({
+              id: Random.string(),
+              ...topic,
+              questionTypes: topic.questionTypes.map((question) => ({
+                id: Random.string(),
+                ...question,
+              })),
+            })),
+            selectedTopicsIds: criteria.topics.map((topic) => topic.topicId),
+          });
+        }
+      });
+  }, [quizId]);
 
   const getTopics = async () => {
     const res = await axios.get(
@@ -387,7 +424,8 @@ export default function QuizCriteria(props) {
     criteriaAtom.change(
       "questionTypes",
       res.data.map((question) => ({
-        id: question._id,
+        // id: question._id,
+        id: question.typeName,
         title: question.typeName,
       }))
     );
@@ -401,22 +439,40 @@ export default function QuizCriteria(props) {
     const loaderId = toast.loading("saving..", {
       autoClose: 300,
     });
+    try {
+      const res = await axios
+        .post(`http://localhost:4000/api/criteria/${quizId}`, options.values)
+        .catch((err) =>
+          toast.update(loaderId, {
+            render: "an error occurred",
+            type: "error",
+            isLoading: false,
+            autoClose: 3000,
+          })
+        );
 
-    const res = await axios
-      .post(
-        `http://localhost:4000/api/criteria/use-in-quiz/${quizId}`,
-        options.values
-      )
-      .catch((err) =>
+      if (!res || !res.data) {
         toast.update(loaderId, {
           render: "an error occurred",
           type: "error",
           isLoading: false,
           autoClose: 3000,
-        })
-      );
+        });
+      }
 
-    if (!res || !res.data) {
+      toast.update(loaderId, {
+        render: "saved",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+
+      criteriaAtom.reset();
+
+      criteriaAtom.silentChange("topics", [generateEmptyTopic()]);
+
+      navigate("/show/" + quizId);
+    } catch {
       toast.update(loaderId, {
         render: "an error occurred",
         type: "error",
@@ -424,15 +480,6 @@ export default function QuizCriteria(props) {
         autoClose: 3000,
       });
     }
-
-    toast.update(loaderId, {
-      render: "saved",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
-
-    navigate("/show/" + quizId);
   };
 
   useEffect(() => {
@@ -441,10 +488,9 @@ export default function QuizCriteria(props) {
   }, []);
 
   const addNewTopic = () => {
-    criteriaAtom.change("topics", [
-      ...criteriaAtom.get("topics"),
-      generateEmptyTopic(),
-    ]);
+    const topics = [...criteriaAtom.get("topics"), generateEmptyTopic()];
+
+    criteriaAtom.change("topics", topics);
   };
 
   const topics = criteriaAtom.use("topics");
@@ -491,249 +537,6 @@ export default function QuizCriteria(props) {
             </Button>
           </div>
         </Form>
-      </div>
-    </>
-  );
-}
-
-function _QuizCriteria(props) {
-  const { id: quizId } = useParams();
-  const navigate = useNavigate();
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-  } = useForm();
-
-  const [areas, setAreas] = useState([0]);
-
-  const [topics, setTopics] = useState([]);
-
-  const [showTopicForm, setShowTopicForm] = useState(false);
-
-  const [allQuestionTypes, setAllQuestionTypes] = useState([]);
-
-  const [questionTypes, setQuestionTypes] = useState([]);
-
-  useEffect(() => {
-    getTopics();
-    getAllQuestionTypes();
-  }, []);
-
-  const onSubmit = async (values) => {
-    // if a topic was added
-    // then get it`s data before saving
-
-    const len = values.areas.length;
-    for (let i = 0; i < len; i++) {
-      const area = values.areas[i];
-
-      if (!area) continue;
-
-      if (area?.topic) {
-        values.areas[i].topic = {
-          ...area.topic,
-          domainName: getDomainName(area.topic.domainId),
-          subDomainName: getSubDomainName(
-            area.topic.domainId,
-            area.topic.subDomainId
-          ),
-        };
-      }
-
-      values.areas[i].selectedQuestions =
-        document.querySelector(`[name="areas[${i}].selectedQuestions"]`)
-          ?.value ?? "";
-    }
-
-    // console.log(values);
-
-    // return;
-
-    const loaderId = toast.loading("saving..", {
-      autoClose: 300,
-    });
-
-    const res = await axios
-      .post(`http://localhost:4000/api/criteria/use-in-quiz/${quizId}`, values)
-      .catch((err) =>
-        toast.update(loaderId, {
-          render: "an error occurred",
-          type: "error",
-          isLoading: false,
-          autoClose: 3000,
-        })
-      );
-
-    if (!res || !res.data) {
-      toast.update(loaderId, {
-        render: "an error occurred",
-        type: "error",
-        isLoading: false,
-        autoClose: 3000,
-      });
-    }
-
-    // console.log(res.data);
-
-    toast.update(loaderId, {
-      render: "saved",
-      type: "success",
-      isLoading: false,
-      autoClose: 3000,
-    });
-    navigate("/show/" + quizId);
-  };
-
-  const onClickCancel = () => {
-    navigate("/show/" + quizId);
-  };
-
-  const getTopics = async () => {
-    const res = await axios.get(
-      "http://localhost:4000/api/topics?paginate=false&quizId=" + quizId
-    );
-    setTopics(res.data);
-  };
-
-  const getAllQuestionTypes = async () => {
-    const res = await axios.get(
-      "http://localhost:4000/api/interactive-object-types?paginate=false"
-    );
-    console.log(res.data);
-    setAllQuestionTypes(res.data);
-  };
-
-  function onSelectTopic(e) {
-    if (e.target.value === "new") {
-      setShowTopicForm(true);
-    } else {
-      setShowTopicForm(false);
-    }
-  }
-
-  return (
-    <>
-      <div className={styles["add-question"]}>
-        <div className={styles.questionType}>
-          <Button
-            variant="contained"
-            color="info"
-            type="submit"
-            onClick={() => setAreas([...areas, areas.length])}
-          >
-            <span>Add Topic</span>
-          </Button>
-
-          <Button variant="outlined" color="error" onClick={onClickCancel}>
-            <Clear />
-            <span>cancel</span>
-          </Button>
-        </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {areas.map((area, index) => (
-            <fieldset key={area} style={{ margin: "1rem 0" }}>
-              <legend>Add Questions Based On Criteria ({area + 1})</legend>
-              <div className={styles.flexRow}>
-                <div style={{ width: "50%" }}>
-                  <Select
-                    style={{ width: "100%" }}
-                    label="topic"
-                    name="topicId"
-                    {...register(`areas[${area}].topicId`)}
-                    placeholder="select topic"
-                    errors={errors}
-                    defaultValue={0}
-                    onChange={onSelectTopic}
-                  >
-                    <MenuItem value="0">Select Topic</MenuItem>
-                    {topics.length > 0 &&
-                      topics.map((topic, idx) => (
-                        <MenuItem key={topic._id} value={topic._id}>
-                          {topic.title}
-                        </MenuItem>
-                      ))}
-                    <MenuItem value="new">
-                      <Button
-                        size="xs"
-                        style={{
-                          textAlign: "center",
-                          width: "100%",
-                        }}
-                        color="warning"
-                      >
-                        Add New Topic
-                      </Button>
-                    </MenuItem>
-                  </Select>
-                </div>
-
-                <div style={{ width: "20%" }}>
-                  <TextField
-                    style={{ width: "100%" }}
-                    label="Number of Questions"
-                    name="numberOfQuestions"
-                    type="number"
-                    {...register(`areas[${area}].numberOfQuestions`)}
-                    errors={errors}
-                  />
-                </div>
-                <div style={{ width: "25%" }}>
-                  <TextField
-                    style={{ width: "100%" }}
-                    label="Duration"
-                    name="duration"
-                    type="number"
-                    {...register(`areas[${area}].duration`)}
-                    errors={errors}
-                  />
-                </div>
-              </div>
-
-              {showTopicForm && (
-                <TopicFormSection register={register} area={area} />
-              )}
-
-              {questionTypes.length > 0 &&
-                questionTypes.map((qt, idx) => (
-                  <TopicQuestionType
-                    register={register}
-                    area={area}
-                    allQuestionTypes={allQuestionTypes}
-                    // questionType={qt}
-                    index={idx}
-                    key={area}
-                  />
-                ))}
-
-              {questionTypes.length < ActiveQuestionTypes.length && (
-                <Button
-                  variant="contained"
-                  type="button"
-                  onClick={() => setQuestionTypes([...questionTypes, {}])}
-                >
-                  Add Question Type
-                </Button>
-              )}
-            </fieldset>
-          ))}
-
-          <div
-            style={{
-              width: "100%",
-              marginTop: "2rem",
-            }}
-          >
-            <Button
-              variant="contained"
-              startIcon={<DesignServices />}
-              type="submit"
-              fullWidth
-            >
-              Submit
-            </Button>
-          </div>
-        </form>
       </div>
     </>
   );
