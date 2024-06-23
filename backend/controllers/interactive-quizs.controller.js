@@ -485,6 +485,9 @@ router.get("/questionInQuize/:id", async (req, res) => {
     }
   }
 
+  // if you want to shuffle all questions then uncomment the following line
+    // questionList = shuffleArray(questionList);
+
   if (req.query.domain && req.query.domain.length > 4) {
     questionList = questionList.filter((q) => q.domainId == req.query.domain);
   }
