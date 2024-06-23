@@ -421,6 +421,11 @@ router.get("/questionInQuize/:id", async (req, res) => {
     if (criteria) {
       const topics = criteria.topics;
 
+      const baseFilter = {
+        isAnswered: "g", // g for green means has answer
+        language: obj.language,
+      };
+
       for (const topic of topics) {
         const { topicId, questionTypes } = topic;
 
@@ -433,8 +438,7 @@ router.get("/questionInQuize/:id", async (req, res) => {
               topicId,
               complexity: "easy",
               type,
-              isAnswered: "g", // g for green means has answer
-              // limit the value with easy
+              ...baseFilter,
             });
 
             criteriaQuestions.push(...easyQuestions.slice(0, Number(easy)));
@@ -446,7 +450,7 @@ router.get("/questionInQuize/:id", async (req, res) => {
               topicId,
               complexity: "medium",
               type,
-              isAnswered: "g", // g for green means has answer
+              ...baseFilter,
             });
 
             criteriaQuestions.push(...mediumQuestions.slice(0, Number(medium)));
@@ -458,7 +462,7 @@ router.get("/questionInQuize/:id", async (req, res) => {
               topicId,
               complexity: "hard",
               type,
-              isAnswered: "g", // g for green means has answer
+              ...baseFilter,
             });
 
             criteriaQuestions.push(...hardQuestions.slice(0, Number(hard)));
