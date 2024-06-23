@@ -409,8 +409,16 @@ router.get("/questionInQuize/:id", async (req, res) => {
 
   if (!obj) return res.status(200).json([]);
 
+  const baseFilter = {
+    isAnswered: "g", // g for green means has answer
+    language: obj.language,
+  };
+
+  // manual questions
   let questionList = await interactiveObjectSchema.find({
     _id: { $in: obj.questionList },
+    ...baseFilter,
+    subDomainId: obj.subDomainId,
   });
 
   /** check if quiz uses auto generated questions */
@@ -420,11 +428,6 @@ router.get("/questionInQuize/:id", async (req, res) => {
 
     if (criteria) {
       const topics = criteria.topics;
-
-      const baseFilter = {
-        isAnswered: "g", // g for green means has answer
-        language: obj.language,
-      };
 
       for (const topic of topics) {
         const { topicId, questionTypes } = topic;
