@@ -444,7 +444,9 @@ router.get("/questionInQuize/:id", async (req, res) => {
               ...baseFilter,
             });
 
-            criteriaQuestions.push(...easyQuestions.slice(0, Number(easy)));
+            criteriaQuestions.push(
+              ...shuffleArray(easyQuestions).slice(0, Number(easy))
+            );
           }
 
           if (medium) {
@@ -456,7 +458,9 @@ router.get("/questionInQuize/:id", async (req, res) => {
               ...baseFilter,
             });
 
-            criteriaQuestions.push(...mediumQuestions.slice(0, Number(medium)));
+            criteriaQuestions.push(
+              ...shuffleArray(mediumQuestions).slice(0, Number(medium))
+            );
           }
 
           if (hard) {
@@ -468,13 +472,15 @@ router.get("/questionInQuize/:id", async (req, res) => {
               ...baseFilter,
             });
 
-            criteriaQuestions.push(...hardQuestions.slice(0, Number(hard)));
+            criteriaQuestions.push(
+              ...shuffleArray(hardQuestions).slice(0, Number(hard))
+            );
           }
         }
       }
     }
 
-    const finalQuestions = shuffleArray(criteriaQuestions);
+    const finalQuestions = criteriaQuestions;
 
     const questionsIds = questionList.map((q) => q._id);
 
@@ -486,7 +492,7 @@ router.get("/questionInQuize/:id", async (req, res) => {
   }
 
   // if you want to shuffle all questions then uncomment the following line
-    // questionList = shuffleArray(questionList);
+  questionList = shuffleArray(questionList);
 
   if (req.query.domain && req.query.domain.length > 4) {
     questionList = questionList.filter((q) => q.domainId == req.query.domain);
