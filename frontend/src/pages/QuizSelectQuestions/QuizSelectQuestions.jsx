@@ -26,7 +26,11 @@ export default function QuizSelectQuestions(props) {
   const [activeQuestion, setActiveQuestion] = React.useState();
   const [selectedRowIds, setSelectedRowIds] = React.useState([]);
   const navigate = useNavigate();
-
+  const [total, setTotal] = React.useState(0);
+  const [paginationModel, setPaginationModel] = React.useState({
+    page: 1,
+    pageSize: 5,
+  });
   React.useEffect(() => {
     fetchQuestions();
   }, []);
@@ -61,8 +65,8 @@ export default function QuizSelectQuestions(props) {
       type: "success",
       isLoading: false,
     });
-    navigate(`/show/${quizId}`);
-    // navigate(`/edit-quiz-list/${quizId}`);
+     navigate(`/show/${quizId}`);
+   // navigate(`/edit-quiz-list/${quizId}`);
   };
 
   const onClickEditQuestion = (id = null) => {
@@ -158,7 +162,9 @@ export default function QuizSelectQuestions(props) {
     if (!quiz) return;
 
     setLoading(true);
-    const res = await axios.get(`/interactive-objects`);
+    const res = await axios.get(
+      `/interactive-objects?page=${paginationModel.page}&limit=${paginationModel.pageSize}`
+    );
     const data = res.data;
     if (!!data.docs.length) {
       setRows(
@@ -177,7 +183,8 @@ export default function QuizSelectQuestions(props) {
       setSelectedRowIds(quiz.questionList.map((q) => q._id));
     }
     setLoading(false);
-  }, []);
+    setTotal(res.data.totalDocs);
+  }, [paginationModel.page, paginationModel.pageSize]);
 
   return (
     <>
@@ -211,17 +218,28 @@ export default function QuizSelectQuestions(props) {
 
       <div className={styles.table}>
         <DataGrid
-          loading={loading}
-          rows={rows}
-          columns={columns}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 30 },
-            },
-          }}
-          pageSizeOptions={[5, 10, 15, 20, 30]}
-          baseCheckbox={RadioButtonCheckedRounded}
-          slots={{ toolbar: GridToolbar }}
+          // loading={loading}
+          // rows={rows}
+          // columns={columns}
+          // initialState={{
+          //   pagination: {
+          //     paginationModel: { page: 0, pageSize: 30 },
+          //   },
+          // }}
+          // pageSizeOptions={[5, 10, 15, 20, 30]}
+          // baseCheckbox={RadioButtonCheckedRounded}
+          // slots={{ toolbar: GridToolbar }}
+              rows={rows}
+              rowCount={total}
+              loading={loading}
+              autoHeight
+              columns={columns}
+              baseCheckbox={RadioButtonCheckedRounded}
+              slots={{ toolbar: GridToolbar }}
+              pageSizeOptions={[5, 10]}
+              paginationModel={paginationModel}
+              paginationMode="server"
+              onPaginationModelChange={setPaginationModel}
         />
       </div>
     </>

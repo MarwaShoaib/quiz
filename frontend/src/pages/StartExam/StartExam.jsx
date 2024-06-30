@@ -44,7 +44,10 @@ const StartExam = (props) => {
   const [studentsList, setStudents] = React.useState([]);
   const [activeStudent, setActiveStudent] = React.useState({
     _id: null,
+     name: null
   });
+  const [check, setCheck] = React.useState(false);
+  const [enteredId, setEnteredId] = React.useState("");
 
   React.useEffect(() => {
     loadQuestion();
@@ -110,6 +113,7 @@ const StartExam = (props) => {
   const fetchStudents = React.useCallback(async () => {
     setLoading(true);
     const res = await axios.get(`/students`, { params: { limit: 500 } });
+    console.log(res);
 
     if (!res || !res.data) {
       toast.error('error loading students');
@@ -251,6 +255,26 @@ const StartExam = (props) => {
       })
     );
   };
+
+  const handleChange = (event) => {
+    const selectedOption = event.target.options[event.target.selectedIndex];
+    setActiveStudent({
+      _id: selectedOption.value,
+      name: selectedOption.text,
+    });
+  };
+
+  const handleCheck = ()=>{
+    console.log(enteredId);
+    console.log(activeStudent._id);
+    if(enteredId == activeStudent._id ){
+      setCheck(true)
+    //  alert ("ok"); 
+    }else{
+      alert("enter correct id ")
+    }
+  }
+
   return (
     <div style={{ padding: '1rem 2rem' }}>
       <Modal show={showModal} handleClose={closeModal}>
@@ -261,11 +285,11 @@ const StartExam = (props) => {
           message='Are you sure to exit this exam?'
         />
       </Modal>
-      <div >
+      {check?<div >
         <div className={`container  ${styles.home}`}>
           <p>quiz name : {question.quizName}</p>
-          <p>student name : {question.quizName}</p>
-          <p>user id : {question.quizName}</p>
+          <p>student name : {activeStudent.name}</p>
+          <p>user id : {activeStudent._id}</p>
 
           <DataGrid
             loading={loading}
@@ -296,7 +320,22 @@ const StartExam = (props) => {
         </div>
 
 
+      </div>:
+      <div>
+        <select value={activeStudent._id || ""} onChange={handleChange}>
+          <option value="" disabled>Select a user</option>
+          {studentsList.map(user => (
+            <option key={user.user_id} value={user.user_id}>
+              {user.name}
+            </option>
+          ))}
+        </select>
+        <hr/>
+        <input placeholder="enter correct id" type="text" value={enteredId} onChange={(e) => setEnteredId(e.target.value)}  />
+        <hr/>
+        <button onClick={handleCheck}> start the exam </button>
       </div>
+      }
     </div>
   );
 };
