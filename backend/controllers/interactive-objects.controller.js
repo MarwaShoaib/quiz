@@ -6,10 +6,11 @@ let interactiveObjectSchema =
   require("../models/interactive-object.model").interactiveObjectSchema;
 let interactiveQuizSchema =
   require("../models/interactive-quiz.model").interactiveQuizSchema;
-let InteractiveObjectTypeSchema = require("../models/object-types.model").InteractiveObjectTypeSchema;
-const fs = require("fs")
-const path = require("path")
-const request = require("request")
+let InteractiveObjectTypeSchema =
+  require("../models/object-types.model").InteractiveObjectTypeSchema;
+const fs = require("fs");
+const path = require("path");
+const request = require("request");
 
 /**
  *@swagger
@@ -256,11 +257,14 @@ router.get("/interactive-objects", async (req, res) => {
 
   delete req.query.page;
   delete req.query.limit;
-  for await (let item of ["object", "domainName", "subDomainName"])
+
+  for (let item of ["object", "domainName", "subDomainName"]) {
     if (req.query[item]) {
       const searchValue = req.query[item];
       req.query[item] = { $regex: new RegExp(searchValue), $options: "i" };
     }
+  }
+
   const data = await interactiveObjectSchema.paginate(req.query, {
     page,
     limit,
@@ -270,16 +274,16 @@ router.get("/interactive-objects", async (req, res) => {
 });
 
 router.get("/isAnswered", async (req, res) => {
-  const { isAnswered } = req.body
-  let obj = await interactiveObjectSchema.find({isAnswered:"g"});
+  const { isAnswered } = req.body;
+  let obj = await interactiveObjectSchema.find({ isAnswered: "g" });
   res.status(200).json(obj);
 });
 router.post("/interactive-objects", async (req, res) => {
   //post the id of quiz as params
   const newObj = new interactiveObjectSchema({ _id: false });
   newObj.objId = new mongoose.Types.ObjectId();
-  
-  const {quizId,...data} = req.body
+
+  const { quizId, ...data } = req.body;
 
   for (let key in data) {
     if (Object.hasOwnProperty.bind(req.body)(key)) {
@@ -288,17 +292,17 @@ router.post("/interactive-objects", async (req, res) => {
       else newObj[key] = req.body[key];
     }
   }
- 
-  newObj.save(async( err, doc) => {
+
+  newObj.save(async (err, doc) => {
     if (!err) {
       res.status(200).json(newObj);
-      console.log("this question post in question-bank")
-      if(quizId){
-        let obj = await interactiveQuizSchema.findById(quizId)
-        obj.questionList.push(newObj._id)
-        await obj.save()
-        console.log("this question post in quiz")
-       }
+      console.log("this question post in question-bank");
+      if (quizId) {
+        let obj = await interactiveQuizSchema.findById(quizId);
+        obj.questionList.push(newObj._id);
+        await obj.save();
+        console.log("this question post in quiz");
+      }
     } else {
       console.log(err);
       res.status(406).json(`Not Acceptable: ${err}`);
@@ -351,29 +355,29 @@ router.delete("/interactive-objects/:id", async (req, res) => {
 
 router.get("/createObject/:id", async (req, res) => {
   // get object
-  console.log('createObject');
+  console.log("createObject");
   let obj = await interactiveObjectSchema.findById(req.params.id);
-  const { type, h5pString, questionName,  } = obj;
+  const { type, h5pString, questionName } = obj;
   let typeData = await InteractiveObjectTypeSchema.find({ typeName: type });
-  const { templateJson, templateUrl } = typeData[0]
+  const { templateJson, templateUrl } = typeData[0];
   console.log(templateUrl);
   request.get(templateUrl, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-        var html = body;
-        for (let key in templateJson) {
-          let replacedText = JSON.stringify(templateJson[key])
-          replacedText = replacedText.substring(1, replacedText.length-1)
-          let newText = JSON.stringify(h5pString[key])
-          newText = newText.substring(1, newText.length-1)
-          html = html.replace(replacedText, newText);
-        }
-        const outputPath = path.join(`${__dirname}/../uploads/${questionName}.html`)
-          fs.writeFileSync(outputPath, html)
-          res.send(`${process.env.APP_URL}/uploads/${questionName}.html`);
-    } else console.log(error)
-});
-
-  
+      var html = body;
+      for (let key in templateJson) {
+        let replacedText = JSON.stringify(templateJson[key]);
+        replacedText = replacedText.substring(1, replacedText.length - 1);
+        let newText = JSON.stringify(h5pString[key]);
+        newText = newText.substring(1, newText.length - 1);
+        html = html.replace(replacedText, newText);
+      }
+      const outputPath = path.join(
+        `${__dirname}/../uploads/${questionName}.html`
+      );
+      fs.writeFileSync(outputPath, html);
+      res.send(`${process.env.APP_URL}/uploads/${questionName}.html`);
+    } else console.log(error);
+  });
 });
 
 module.exports = router;

@@ -167,7 +167,7 @@ export default function DataShowQuiz(props) {
 
   const fetchQuestions = React.useCallback(async () => {
     setLoading(true);
-    const res = await axios.get(`/questionInQuize/${id}`);
+    const res = await axios.get(`/questionInQuize/${id}?questionsInQuiz=true`);
     const data = res.data;
 
     if (!!data.length) {
@@ -189,7 +189,7 @@ export default function DataShowQuiz(props) {
 
   const fetchData = React.useCallback(async (id) => {
     setLoading(true);
-    const res = await axios.get(`/questionInQuize/${id}`);
+    const res = await axios.get(`/questionInQuize/${id}?questionsInQuiz=true`);
     const data = res.data;
 
     if (!!data.length) {

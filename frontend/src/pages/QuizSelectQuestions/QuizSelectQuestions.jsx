@@ -163,7 +163,7 @@ export default function QuizSelectQuestions(props) {
 
     setLoading(true);
     const res = await axios.get(
-      `/interactive-objects?page=${paginationModel.page}&limit=${paginationModel.pageSize}`
+      `/interactive-objects?page=${paginationModel.page}&limit=${paginationModel.pageSize}&subDomainId=${quiz.subDomainId}`
     );
     const data = res.data;
     if (!!data.docs.length) {
