@@ -72,6 +72,13 @@ const StudentsAdd = () => {
                                 register={register}
                                 errors={errors}
                             />
+                            <Input
+                                label='User ID'
+                                name='user-id'
+                                type='text'
+                                register={register}
+                                errors={errors}
+                            />
 
                             <div className={styles.actions}>
                                 <Button

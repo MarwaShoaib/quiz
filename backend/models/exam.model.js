@@ -4,7 +4,7 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const objID = mongoose.Types.ObjectId;
 var ExamSchema = new mongoose.Schema(
     {
-        name: { type: String },
+        //name: { type: String },
         studentId: { type: String },
         studentName: {
             type: String,

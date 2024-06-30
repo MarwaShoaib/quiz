@@ -89,7 +89,7 @@ const AddQuiz = () => {
     const id = await saveObject(data);
     setFormState({ id, ...data });
   };
-  const onSubmitOcr = async (values) => {
+  const onSubmitCriteria = async (values) => {
     const data = {
       ...values,
       domainName: getDomainName(values.domainId),
@@ -290,10 +290,10 @@ const AddQuiz = () => {
                 <Button
                   variant="contained"
                   //   onClick={onClickExcelFile}
-                  onClick={handleSubmit(onSubmitOcr)}
+                  onClick={handleSubmit(onSubmitCriteria)}
                   startIcon={<InsertDriveFileIcon />}
                 >
-                  Auto Create
+                  Define Criteria 
                 </Button>
                 <Button variant="contained" onClick={onClickCancel}>
                   <ClearIcon />

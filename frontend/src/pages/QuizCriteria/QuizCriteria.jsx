@@ -230,9 +230,22 @@ function TopicElement({ topic, index }) {
   };
 
   return (
-    <Accordion defaultExpanded={index === 0}>
+    <Accordion >
       <AccordionSummary>
-        {topicInfo?.title || `Topic ${index + 1}`}
+        <div style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "15rem",
+        }}>
+          <div> {topicInfo?.title || `Topic ${index + 1}`}</div>
+          <div> Total Questions: {topic.totalQuestions}</div>
+          <div>Est Duration: {topic.duration}</div>
+        </div>
+        {/* {topicInfo?.title || `Topic ${index + 1}`}
+        
+        Total Questions: {topic.totalQuestions} */}
+
       </AccordionSummary>
       <AccordionDetails>
         {index > 0 && (
@@ -284,7 +297,7 @@ function TopicElement({ topic, index }) {
           </div>
         </div>
 
-        <Typography variant="h4" mb={2}>
+        <Typography variant="h5" mb={2}>
           Questions Types
         </Typography>
         {/* Questions */}
@@ -429,6 +442,7 @@ export default function QuizCriteria(props) {
         title: question.typeName,
       }))
     );
+
   };
 
   const onClickCancel = () => {
@@ -499,20 +513,21 @@ export default function QuizCriteria(props) {
     <>
       <div className={styles["add-question"]}>
         <div className={styles.questionType}>
-          <Button
+          {/* <Button
             variant="contained"
             color="info"
             type="submit"
             onClick={addNewTopic}
           >
             <span>Add Topic</span>
-          </Button>
-          <Button variant="outlined" color="error" onClick={onClickCancel}>
+          </Button> */}
+          {/* <Button variant="outlined" color="error" onClick={onClickCancel}>
             <Clear />
             <span>cancel</span>
-          </Button>
+          </Button> */}
         </div>
         <Form onSubmit={handleSubmit}>
+          <legend>Add Criteria </legend>
           {topics.map((topic, index) => (
             <TopicElement
               topic={topic}
@@ -527,6 +542,17 @@ export default function QuizCriteria(props) {
               marginTop: "2rem",
             }}
           >
+            <Button
+              variant="contained"
+              color="info"
+              type="submit"
+              onClick={addNewTopic}
+            >
+              <span>Add Topic</span>
+            </Button>
+            <div style={{
+              marginBottom: "1rem",
+            }}></div>
             <Button
               variant="contained"
               startIcon={<DesignServices />}

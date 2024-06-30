@@ -59,6 +59,24 @@ const Navbar = () => {
           >
             Topics
           </Link>
+          <Link
+            to="/students"
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+            }}
+          >
+            Students
+          </Link>
+          <Link
+            to="/exams"
+            style={{
+              color: "#fff",
+              textDecoration: "none",
+            }}
+          >
+            reports
+          </Link>
         </div>
       </AppBar>
     </Box>

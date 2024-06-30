@@ -95,7 +95,13 @@ const StudentsEdit = () => {
                                 register={register}
                                 errors={errors}
                             />
-
+                            <Input
+                                label='User ID'
+                                name='user_id'
+                                type='text'
+                                register={register}
+                                errors={errors}
+                            />
                             <div className={styles.actions}>
                                 <Button
                                     variant='contained'

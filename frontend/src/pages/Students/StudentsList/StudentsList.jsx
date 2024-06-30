@@ -57,9 +57,14 @@ export default function StudentsList(props) {
     };
 
     const columns = [
+        // {
+        //     field: 'id',
+        //     headerName: 'ID',
+        //     flex: 0.5,
+        // },
         {
-            field: 'id',
-            headerName: 'ID',
+            field: 'user_id',
+            headerName: 'User ID',
             flex: 0.5,
         },
         {
@@ -108,6 +113,7 @@ export default function StudentsList(props) {
                 data.docs.map((item) => ({
                     id: item._id,
                     name: item.name,
+                    user_id: item.user_id,
                 }))
             );
         }

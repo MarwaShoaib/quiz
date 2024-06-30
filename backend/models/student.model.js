@@ -5,6 +5,7 @@ const objID = mongoose.Types.ObjectId;
 var StudentSchema = new mongoose.Schema(
     {
         name: { type: String, required: 'This field is required.' },
+        user_id: { type: Number, required: 'This field is required.' },
         createdAt: { type: Date, default: Date.now },
         updatedAt: { type: Date, default: Date.now },
     },

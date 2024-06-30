@@ -35,7 +35,8 @@ export default function DataTableForRoomQuiz(props) {
     };
 
     const onTakeExam = (id) => {
-        navigate(`/quizzes/${id}/exam`);
+      //  navigate(`/quizzes/${id}/exam`);
+        navigate(`/quizzes/${id}/start-exam`);
     };
 
     const onShowExams = (id) => {
@@ -73,7 +74,7 @@ export default function DataTableForRoomQuiz(props) {
             headerName: 'Title',
             width: 200,
             renderCell: (params) => {
-                return <Link to={`/show/${params.id}`}>{params.row.name}</Link>;
+                return <Link to={`/quizzes/${params.id}/start-exam`}>{params.row.name}</Link>;
             },
         },
         {
@@ -111,25 +112,25 @@ export default function DataTableForRoomQuiz(props) {
             headerName: 'Complexity',
             width: 100,
         },
-        {
-            field: 'actions',
-            headerName: 'Actions',
-            width: 100,
-            renderCell: (params) => {
-                return (
-                    <>
-                        <IconButton
-                            aria-label='takeExam'
-                            color='info'
-                            onClick={() => onTakeExam(params.id)}
-                        >
-                            <QuestionMark />
-                        </IconButton>
+        // {
+        //     field: 'actions',
+        //     headerName: 'Actions',
+        //     width: 100,
+        //     renderCell: (params) => {
+        //         return (
+        //             <>
+        //                 <IconButton
+        //                     aria-label='takeExam'
+        //                     color='info'
+        //                     onClick={() => onTakeExam(params.id)}
+        //                 >
+        //                     <QuestionMark />
+        //                 </IconButton>
                         
-                    </>
-                );
-            },
-        },
+        //             </>
+        //         );
+        //     },
+        // },
     ];
 
     const fetchQuestions = React.useCallback(async () => {

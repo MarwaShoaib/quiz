@@ -185,7 +185,7 @@ export default function QuizSelectQuestions(props) {
         // save exam results
         const calculatedResult = calculateResult();
         const data = {
-            name: activeStudent.exam,
+           // name: activeStudent.exam,
             studentId: activeStudent._id,
             studentName: activeStudent.name,
             quizId: quiz._id,

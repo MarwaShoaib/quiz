@@ -221,13 +221,13 @@ export default function DataTable(props) {
                     <Button variant='contained' onClick={onClickAddQuiz}>
                         Add Quiz
                     </Button>
-                    <Button
+                    {/* <Button
                         variant='contained'
                         color='info'
                         onClick={onClickOpenStudents}
                     >
                         Students
-                    </Button>
+                    </Button> */}
                     {/* <Button
                         variant='contained'
                         color='warning'

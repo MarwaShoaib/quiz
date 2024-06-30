@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import TrueFalse from "./components/TrueFalse/TrueFalse";
 import Navbar from "./components/Navbar/Navbar";
 import Show from "./components/Show/Show";
+import Create from "./components/Create/Create";
 // import FillBlank from "./components/FillBlank/FillBlank";
 import MultipleChoice from "./components/MultipleChoice/MultipleChoice";
 import Bulk from "./components/MultipleChoice/Bulk/Bulk";
@@ -36,6 +37,7 @@ import TopicsAdd from "./pages/TopicsAdd/TopicsAdd";
 import TopicsEdit from "./pages/TopicsEdit/TopicsEdit";
 import QuizSelectQuestions from "./pages/QuizSelectQuestions/QuizSelectQuestions";
 import QuizExam from "./pages/QuizExam";
+import StartExam from "./pages/StartExam/StartExam";
 import QuizCriteria from "./pages/QuizCriteria/QuizCriteria";
 import StudentsList from "./pages/Students/StudentsList";
 import StudentsAdd from "./pages/Students/StudentsAdd";
@@ -124,10 +126,12 @@ function App() {
             />
 
             <Route path="/quizzes/:id/exam" Component={QuizExam} />
+            <Route path="/quizzes/:id/start-exam" Component={StartExam} />
 
             <Route path="/quizzes/:id/criteria" Component={QuizCriteria} />
 
             <Route path="/quizzes/:id/exams-list" Component={QuizExamsList} />
+            <Route path="create/:id" Component={Create} />
           </Routes>
           <Footer />
         </div>

@@ -58,11 +58,11 @@ export default function ExamsList(props) {
     };
 
     const columns = [
-        {
-            field: 'name',
-            headerName: 'Name',
-            flex: 1,
-        },
+        // {
+        //     field: 'name',
+        //     headerName: 'Name',
+        //     flex: 1,
+        // },
         {
             field: 'studentName',
             headerName: 'Student Name',
@@ -150,11 +150,11 @@ export default function ExamsList(props) {
                 <div>
                     <h3>Exams</h3>
                 </div>
-                <div className={styles.actions}>
+                {/* <div className={styles.actions}>
                     <Button variant='contained' onClick={onClickAddExam}>
                         Add Exam
                     </Button>
-                </div>
+                </div> */}
             </div>
 
             <div className={styles.table}>

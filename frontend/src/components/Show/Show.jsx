@@ -46,7 +46,9 @@ const Show = (props) => {
 
   return (
     <div className={`container  ${styles.home}`}>
-      <p>Questions in {question.quizName}: </p>
+      <p>Questions that match with this criteria 
+        {/* {question.quizName} */}
+        : </p>
       <div className={styles.questionType}>
         <Button variant="outlined" onClick={onClickCancel}>
           <ClearIcon />
@@ -61,7 +63,7 @@ const Show = (props) => {
           // color='secondary'
           onClick={onClickUseCriteria}
         >
-          <span>use Criteria</span>
+          <span>edit Criteria</span>
         </Button>
         <Button
           variant="contained"
